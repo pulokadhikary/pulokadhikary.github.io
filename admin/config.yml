@@ -1,21 +1,54 @@
-# Netlify CMS configuration placeholder (Do not publish yet)
 backend:
-  name: git-gateway  # or github
+  name: git-gateway
   branch: main
+
 media_folder: "assets/uploads"
 public_folder: "/assets/uploads"
+
 publish_mode: editorial_workflow
+
 collections:
-  - name: "posts"
-    label: "Posts"
-    folder: "feed/_posts"
+  - name: "feed"
+    label: "Feed"
+    folder: "feed"
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    media_folder: "{{media_folder}}/feed"
+    public_folder: "{{public_folder}}/feed"
+    format: "frontmatter"
+    extension: "md"
     fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Publish Date", name: "date", widget: "datetime" }
-      - { label: "Category", name: "category", widget: "string" }
-      - { label: "Tags", name: "tags", widget: "list" }
-      - { label: "Featured Image", name: "image", widget: "image" }
-      - { label: "Body", name: "body", widget: "markdown" }
-# Note: Admin index.html will be added later at /admin/index.html to load Netlify CMS UI.
+      - label: "Title"
+        name: "title"
+        widget: "string"
+        required: true
+      - label: "Text"
+        name: "text"
+        widget: "markdown"
+        required: true
+      - label: "Date"
+        name: "date"
+        widget: "datetime"
+        required: true
+      - label: "Main Image"
+        name: "image"
+        widget: "image"
+        required: true
+      - label: "Category"
+        name: "category"
+        widget: "string"
+        required: true
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        required: false
+      - label: "Enable Share Button"
+        name: "enable_share"
+        widget: "boolean"
+        default: true
+      - label: "Enable Copy Link Button"
+        name: "enable_copy_link"
+        widget: "boolean"
+        default: true
+
+# Note: Admin index.html will be served at /admin/index.html to load Netlify CMS UI
