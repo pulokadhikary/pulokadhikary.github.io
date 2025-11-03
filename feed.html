@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed - Pulok Adhikary</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Netlify CMS Integration -->
+    <!-- Configuration: /admin/config.yml -->
+    <!-- Collections: posts will be stored in /feed/_posts/ -->
+    
+    <!-- Gitalk Configuration -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">Pulok Adhikary</div>
+            <ul class="nav-menu">
+                <a href="index.html#home">Home</a>
+                <a href="index.html#about">About</a>
+                <a href="index.html#experience">Experience</a>
+                <a href="index.html#education">Education</a>
+                <a href="index.html#skills">Skills & Awards</a>
+                <a href="feed.html" class="active">Feed</a>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Feed Section -->
+    <section class="feed-section">
+        <div class="container">
+            <h1>Activity Feed</h1>
+            <p class="feed-subtitle">Latest updates on disaster management, training initiatives, and community projects</p>
+            
+            <!-- Feed Container for Netlify CMS Posts -->
+            <div class="feed-container" id="feed-container">
+                <!-- Posts will be dynamically loaded here by Netlify CMS -->
+                <!-- Each post will have the following structure: -->
+                
+                <!-- Template for Activity Post -->
+                <article class="feed-post" data-cms-editable="true">
+                    <div class="post-meta">
+                        <span class="post-date">{{date}}</span>
+                        <div class="post-tags">
+                            <!-- Tags will be displayed here: -->
+                            <!-- <span class="tag">{{category}}</span> -->
+                            <!-- <span class="tag">{{tag1}}</span> -->
+                            <!-- <span class="tag">{{tag2}}</span> -->
+                        </div>
+                    </div>
+                    
+                    <h2 class="post-title">{{title}}</h2>
+                    
+                    <div class="post-image">
+                        <img src="{{image-url}}" alt="{{image-alt}}" class="feed-image"/>
+                    </div>
+                    
+                    <div class="post-content">
+                        {{post-text}}
+                    </div>
+                    
+                    <div class="post-actions">
+                        <button class="btn-share" onclick="sharePost()">Share</button>
+                        <button class="btn-copy-link" onclick="copyLink()">Copy Link</button>
+                    </div>
+                </article>
+                <!-- End Post Template -->
+                
+                <!-- Sample Post Structure (Remove after implementation) -->
+                <article class="feed-post">
+                    <div class="post-meta">
+                        <span class="post-date">November 3, 2025</span>
+                        <div class="post-tags">
+                            <span class="tag">Disaster Management</span>
+                            <span class="tag">Training</span>
+                        </div>
+                    </div>
+                    
+                    <h2 class="post-title">Training Session on Emergency Preparedness</h2>
+                    
+                    <div class="post-image">
+                        <img src="placeholder-image.jpg" alt="Training session" class="feed-image"/>
+                    </div>
+                    
+                    <div class="post-content">
+                        <p>Conducted comprehensive training on emergency preparedness and disaster response protocols for community members. The session covered evacuation procedures, first aid basics, and communication strategies during emergencies.</p>
+                    </div>
+                    
+                    <div class="post-actions">
+                        <button class="btn-share" onclick="sharePost()">Share</button>
+                        <button class="btn-copy-link" onclick="copyLink()">Copy Link</button>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gitalk Comments Section -->
+    <section class="comments-section">
+        <div class="container">
+            <h2>Comments & Discussion</h2>
+            <!-- Gitalk Container -->
+            <div id="gitalk-container"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Pulok Adhikary. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Utility Functions -->
+    <script>
+        // Share Post Function
+        function sharePost() {
+            if (navigator.share) {
+                navigator.share({
+                    title: document.querySelector('.post-title').innerText,
+                    text: 'Check out this post',
+                    url: window.location.href
+                }).catch(err => console.log('Error sharing:', err));
+            } else {
+                alert('Share functionality not supported on this device');
+            }
+        }
+
+        // Copy Link Function
+        function copyLink() {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Link copied to clipboard!');
+            }).catch(err => console.log('Error copying:', err));
+        }
+
+        // Gitalk Configuration (To be customized)
+        const gitalk = new Gitalk({
+            clientID: 'YOUR_CLIENT_ID',
+            clientSecret: 'YOUR_CLIENT_SECRET',
+            repo: 'pulokadhikary.github.io',
+            owner: 'pulokadhikary',
+            admin: ['pulokadhikary'],
+            id: location.pathname,
+            distractionFreeMode: false
+        });
+        gitalk.render('gitalk-container');
+    </script>
+</body>
+</html>
