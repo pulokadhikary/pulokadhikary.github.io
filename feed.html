@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feed - Pulok Adhikary</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Netlify CMS Integration -->
-    <!-- Configuration: /admin/config.yml -->
-    <!-- Collections: posts will be stored in /feed/_posts/ -->
-    
-    <!-- Gitalk Configuration -->
+    <!-- Markdown Parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <!-- Gitalk for comments -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
     <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
 </head>
@@ -19,12 +20,12 @@
         <div class="container">
             <div class="nav-brand">Pulok Adhikary</div>
             <ul class="nav-menu">
-                <a href="index.html#home">Home</a>
-                <a href="index.html#about">About</a>
-                <a href="index.html#experience">Experience</a>
-                <a href="index.html#education">Education</a>
-                <a href="index.html#skills">Skills & Awards</a>
-                <a href="feed.html" class="active">Feed</a>
+                <li><a href="index.html#home">Home</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#experience">Experience</a></li>
+                <li><a href="index.html#education">Education</a></li>
+                <li><a href="index.html#skills">Skills & Awards</a></li>
+                <li><a href="feed.html" class="active">Feed</a></li>
             </ul>
         </div>
     </nav>
@@ -33,72 +34,22 @@
     <section class="feed-section">
         <div class="container">
             <h1>Activity Feed</h1>
-            <p class="feed-subtitle">Latest updates on disaster management, training initiatives, and community projects</p>
+            <p class="feed-subtitle">Latest updates on projects, learning, and community initiatives</p>
             
-            <!-- Feed Container for Netlify CMS Posts -->
-            <div class="feed-container" id="feed-container">
-                <!-- Posts will be dynamically loaded here by Netlify CMS -->
-                <!-- Each post will have the following structure: -->
-                
-                <!-- Template for Activity Post -->
-                <article class="feed-post" data-cms-editable="true">
-                    <div class="post-meta">
-                        <span class="post-date">{{date}}</span>
-                        <div class="post-tags">
-                            <!-- Tags will be displayed here: -->
-                            <!-- <span class="tag">{{category}}</span> -->
-                            <!-- <span class="tag">{{tag1}}</span> -->
-                            <!-- <span class="tag">{{tag2}}</span> -->
-                        </div>
-                    </div>
-                    
-                    <h2 class="post-title">{{title}}</h2>
-                    
-                    <div class="post-image">
-                        <img src="{{image-url}}" alt="{{image-alt}}" class="feed-image"/>
-                    </div>
-                    
-                    <div class="post-content">
-                        {{post-text}}
-                    </div>
-                    
-                    <div class="post-actions">
-                        <button class="btn-share" onclick="sharePost()">Share</button>
-                        <button class="btn-copy-link" onclick="copyLink()">Copy Link</button>
-                    </div>
-                </article>
-                <!-- End Post Template -->
-                
-                <!-- Sample Post Structure (Remove after implementation) -->
-                <article class="feed-post">
-                    <div class="post-meta">
-                        <span class="post-date">November 3, 2025</span>
-                        <div class="post-tags">
-                            <span class="tag">Disaster Management</span>
-                            <span class="tag">Training</span>
-                        </div>
-                    </div>
-                    
-                    <h2 class="post-title">Training Session on Emergency Preparedness</h2>
-                    
-                    <div class="post-image">
-                        <img src="placeholder-image.jpg" alt="Training session" class="feed-image"/>
-                    </div>
-                    
-                    <div class="post-content">
-                        <p>Conducted comprehensive training on emergency preparedness and disaster response protocols for community members. The session covered evacuation procedures, first aid basics, and communication strategies during emergencies.</p>
-                    </div>
-                    
-                    <div class="post-actions">
-                        <button class="btn-share" onclick="sharePost()">Share</button>
-                        <button class="btn-copy-link" onclick="copyLink()">Copy Link</button>
-                    </div>
-                </article>
+            <!-- Admin Access Notice (visible only to owner) -->
+            <div class="admin-info" id="adminInfo" style="display:none;">
+                <p>📝 <strong>Owner Mode:</strong> You can upload images and create posts via the <a href="admin/index.html">Admin Panel</a></p>
+            </div>
+
+            <!-- Feed Container -->
+            <div class="feed-container" id="feedContainer">
+                <!-- Posts will be dynamically loaded here -->
+                <div class="loading">Loading posts...</div>
             </div>
         </div>
     </section>
 
-    <!-- Gitalk Comments Section -->
+    <!-- Comments Section -->
     <section class="comments-section">
         <div class="container">
             <h2>Comments & Discussion</h2>
@@ -111,17 +62,135 @@
     <footer class="footer">
         <div class="container">
             <p>&copy; 2025 Pulok Adhikary. All rights reserved.</p>
+            <p><small>Feed powered by Markdown posts from <code>/_posts</code> directory</small></p>
         </div>
     </footer>
 
-    <!-- Utility Functions -->
     <script>
+        // Configuration
+        const POSTS_DIR = '_posts';
+        const ASSETS_DIR = 'assets';
+        const OWNER = 'pulokadhikary';
+        
+        // Check if user is owner (basic check - real auth should be server-side)
+        function isOwner() {
+            // This is a simple check - in production, use proper authentication
+            const userInfo = localStorage.getItem('ownerMode');
+            return userInfo === 'true';
+        }
+
+        // Show admin panel notification if owner
+        if (isOwner()) {
+            document.getElementById('adminInfo').style.display = 'block';
+        }
+
+        // Parse YAML front matter from markdown
+        function parseFrontMatter(content) {
+            const match = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+            if (!match) return { meta: {}, content: content };
+            
+            const frontMatter = {};
+            const metaStr = match[1];
+            metaStr.split('\n').forEach(line => {
+                const [key, ...valueParts] = line.split(':');
+                if (key && valueParts.length > 0) {
+                    frontMatter[key.trim()] = valueParts.join(':').trim().replace(/["']/g, '');
+                }
+            });
+            
+            return { meta: frontMatter, content: match[2] };
+        }
+
+        // Fetch and render posts
+        async function loadPosts() {
+            try {
+                const feedContainer = document.getElementById('feedContainer');
+                feedContainer.innerHTML = '';
+
+                // Try to fetch the index of posts
+                // Since we're using static GitHub Pages, we'll use a manifest file or hardcode posts
+                // For now, we'll try to fetch known posts
+                
+                const postFiles = [
+                    '2025-11-04-sample.md'
+                    // Add more post filenames as they are created
+                ];
+
+                let postsData = [];
+
+                for (const file of postFiles) {
+                    try {
+                        const response = await fetch(`${POSTS_DIR}/${file}`);
+                        if (!response.ok) continue;
+                        
+                        const content = await response.text();
+                        const { meta, content: postContent } = parseFrontMatter(content);
+                        
+                        postsData.push({
+                            filename: file,
+                            title: meta.title || file,
+                            date: meta.date || '2025-11-04',
+                            author: meta.author || OWNER,
+                            category: meta.category || 'General',
+                            content: postContent
+                        });
+                    } catch (error) {
+                        console.error(`Error loading post ${file}:`, error);
+                    }
+                }
+
+                // Sort posts by date (newest first)
+                postsData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                // Render posts
+                if (postsData.length === 0) {
+                    feedContainer.innerHTML = '<p class="no-posts">No posts yet. Check back soon!</p>';
+                    return;
+                }
+
+                postsData.forEach(post => {
+                    const article = document.createElement('article');
+                    article.className = 'feed-post';
+                    
+                    const renderedContent = marked.parse(post.content);
+                    
+                    article.innerHTML = `
+                        <div class="post-meta">
+                            <span class="post-date">${post.date}</span>
+                            <div class="post-tags">
+                                <span class="tag">${post.category}</span>
+                                <span class="tag">by ${post.author}</span>
+                            </div>
+                        </div>
+                        <h2 class="post-title">${post.title}</h2>
+                        <div class="post-content">
+                            ${renderedContent}
+                        </div>
+                        <div class="post-actions">
+                            <button class="btn-share" onclick="sharePost('${post.title}')">Share</button>
+                            <button class="btn-copy-link" onclick="copyLink()">Copy Link</button>
+                        </div>
+                    `;
+                    
+                    feedContainer.appendChild(article);
+                });
+
+                // Highlight code blocks
+                document.querySelectorAll('pre code').forEach(block => {
+                    hljs.highlightElement(block);
+                });
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                document.getElementById('feedContainer').innerHTML = '<p class="error">Error loading feed. Please try again later.</p>';
+            }
+        }
+
         // Share Post Function
-        function sharePost() {
+        function sharePost(title) {
             if (navigator.share) {
                 navigator.share({
-                    title: document.querySelector('.post-title').innerText,
-                    text: 'Check out this post',
+                    title: title || 'Check out this post',
+                    text: 'Check out this activity post',
                     url: window.location.href
                 }).catch(err => console.log('Error sharing:', err));
             } else {
@@ -137,10 +206,10 @@
             }).catch(err => console.log('Error copying:', err));
         }
 
-        // Gitalk Configuration (To be customized)
+        // Gitalk Configuration (Update with your credentials)
         const gitalk = new Gitalk({
-            clientID: 'YOUR_CLIENT_ID',
-            clientSecret: 'YOUR_CLIENT_SECRET',
+            clientID: 'YOUR_GITHUB_CLIENT_ID',
+            clientSecret: 'YOUR_GITHUB_CLIENT_SECRET',
             repo: 'pulokadhikary.github.io',
             owner: 'pulokadhikary',
             admin: ['pulokadhikary'],
@@ -148,6 +217,9 @@
             distractionFreeMode: false
         });
         gitalk.render('gitalk-container');
+
+        // Load posts on page load
+        document.addEventListener('DOMContentLoaded', loadPosts);
     </script>
 </body>
 </html>
