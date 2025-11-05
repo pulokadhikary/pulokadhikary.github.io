@@ -1,12 +1,28 @@
----
-layout: default
-title: Home
----
-<!-- Hero Section -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Pulok Adhikary</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">Pulok Adhikary</div>
+            <ul class="nav-menu">
+                <a href="/">Home</a>
+                <a href="/feed.html">Feed</a>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
 <section class="hero" id="home">
     <div class="container">
-        <h1>{{ site.author.name }}</h1>
-        <p class="subtitle">{{ site.author.bio }}</p>
+        <h1>Pulok Adhikary</h1>
+        <p class="subtitle">Trainer in Disaster Management | President's Scout | Youth Climate Activist</p>
         <p class="hero-bio">Dedicated disaster management professional, emergency responder, and youth leader committed to building resilient communities through training, leadership, and climate action advocacy.</p>
     </div>
 </section>
@@ -23,10 +39,10 @@ title: Home
     <div class="container">
         <h2>About the Author</h2>
         <div class="author-bio">
-            <img src="{{ site.author.profile_picture }}" alt="{{ site.author.name }}'s Profile Picture" class="profile-pic">
+            <img src="assets/profile.png" alt="Pulok Adhikary's Profile Picture" class="profile-pic">
             <div class="author-info">
-                <h3>{{ site.author.name }}</h3>
-                <p>{{ site.author.bio }}</p>
+                <h3>Pulok Adhikary</h3>
+                <p>Trainer in Disaster Management | President's Scout | Youth Climate Activist</p>
             </div>
         </div>
     </div>
@@ -69,19 +85,27 @@ title: Home
     <div class="container">
         <h2>Recent Posts</h2>
         <div class="post-grid">
-            {% for post in site.posts limit:3 %}
+
                 <div class="post-card">
-                    {% if post.image %}
-                        <img src="{{ post.image }}" alt="{{ post.title }}" class="post-image">
-                    {% else %}
-                        <img src="https://via.placeholder.com/400x200" alt="Post Image" class="post-image">
-                    {% endif %}
+
+                        <img src="../assets/sample-activity.png" alt="Sample Daily Activity" class="post-image">
+
                     <div class="post-content">
-                        <h3><a href="{{ post.url }}">{{ post.title }}</a></h3>
-                        <p class="post-date">{{ post.date | date: "%B %d, %Y" }}</p>
+                        <h3><a href="/daily/2025/11/04/sample.html">Sample Daily Activity</a></h3>
+                        <p class="post-date">November 04, 2025</p>
                     </div>
                 </div>
-            {% endfor %}
+
+                <div class="post-card">
+
+                        <img src="https://via.placeholder.com/400x200" alt="Jotajoti Activity" class="post-image">
+
+                    <div class="post-content">
+                        <h3><a href="/scouting/2025/11/04/jotajoti.html">Jotajoti Activity</a></h3>
+                        <p class="post-date">November 04, 2025</p>
+                    </div>
+                </div>
+
         </div>
     </div>
 </section>
@@ -134,3 +158,13 @@ title: Home
         </div>
     </div>
 </section>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            © 2025 Pulok Adhikary. All rights reserved.
+        </div>
+    </footer>
+</body>
+</html>

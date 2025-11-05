@@ -334,28 +334,28 @@ section h2 {
     .hero h1 {
         font-size: 2rem;
     }
-    
+
     .hero p {
         font-size: 1rem;
     }
-    
+
     section h2 {
         font-size: 1.8rem;
     }
-    
+
     .nav-menu {
         flex-direction: column;
         gap: 0.5rem;
     }
-    
+
     .skills-container {
         grid-template-columns: 1fr;
     }
-    
+
     .experience-item {
         flex-direction: column;
     }
-    
+
     .experience-content {
         margin-left: 0;
         margin-top: 1rem;

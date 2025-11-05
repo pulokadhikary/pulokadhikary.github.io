@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }} - {{ site.title }}</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">{{ site.title }}</div>
+            <ul class="nav-menu">
+                <a href="/">Home</a>
+                <a href="/feed.html">Feed</a>
+            </ul>
+        </div>
+    </nav>
+
+    {{ content }}
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            © {{ site.time | date: '%Y' }} {{ site.author.name }}. All rights reserved.
+        </div>
+    </footer>
+</body>
+</html>

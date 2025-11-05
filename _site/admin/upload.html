@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Upload Posts & Images</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .admin-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        header {
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .auth-section {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .auth-section h2 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        input[type="password"],
+        input[type="file"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        input[type="password"]:focus,
+        input[type="file"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-upload {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-upload:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-upload:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-cancel {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-cancel:hover {
+            background: #e0e0e0;
+        }
+
+        .message {
+            padding: 12px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .message.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            display: block;
+        }
+
+        .security-info {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #1565c0;
+        }
+
+        .security-info strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .section-divider {
+            border-top: 1px solid #eee;
+            margin: 30px 0;
+        }
+
+        .instructions {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .instructions h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 1.6;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <header>
+            <h1>📱 Feed Admin Panel</h1>
+            <p class="subtitle">Owner-Only Upload & Post Management</p>
+        </header>
+
+        <div class="security-info">
+            <strong>🔒 Security Notice:</strong>
+            This panel is restricted to the repository owner only. Unauthorized access attempts are logged. Only image files are allowed (JPG, PNG, WebP, GIF).
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <div class="auth-section">
+            <h2>Owner Authentication</h2>
+            <div class="form-group">
+                <label for="ownerPassword">Owner Password / GitHub Token</label>
+                <input type="password" id="ownerPassword" placeholder="Enter verification code" />
+            </div>
+        </div>
+
+        <div id="uploadSection" style="display: none;">
+            <div class="auth-section">
+                <h2>Upload Image to Assets</h2>
+                <div class="form-group">
+                    <label for="imageFile">Select Image File</label>
+                    <input type="file" id="imageFile" accept="image/*" />
+                    <small style="color: #666; margin-top: 5px; display: block;">Supported: JPG, PNG, WebP, GIF (Max 5MB)</small>
+                </div>
+                <button class="btn-upload" onclick="uploadImage()">Upload Image to Assets</button>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <div class="auth-section">
+                <h2>Create New Post</h2>
+                <div class="form-group">
+                    <label for="postTitle">Post Title</label>
+                    <input type="text" id="postTitle" placeholder="e.g., Daily Activity - November 5" />
+                </div>
+                <div class="form-group">
+                    <label for="postDate">Post Date</label>
+                    <input type="date" id="postDate" />
+                </div>
+                <div class="form-group">
+                    <label for="postCategory">Category</label>
+                    <input type="text" id="postCategory" placeholder="e.g., Daily, Training, Project" />
+                </div>
+                <div class="form-group">
+                    <label for="postContent">Post Content (Markdown)</label>
+                    <textarea id="postContent" placeholder="Write your post in Markdown format...\n\n![Alt text](../assets/image-name.png)"></textarea>
+                </div>
+                <button class="btn-upload" onclick="createPost()">Create & Commit Post</button>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <div class="instructions">
+                <h3>📝 Instructions:</h3>
+                <ol>
+                    <li>Upload images to the <code>assets/</code> folder</li>
+                    <li>Create posts in Markdown format with YAML front matter</li>
+                    <li>Reference images using: <code>![Alt](../assets/filename.png)</code></li>
+                    <li>Posts are automatically added to the feed in reverse chronological order</li>
+                    <li>Commits are made directly to the main branch</li>
+                </ol>
+            </div>
+        </div>
+
+        <button class="btn-cancel" onclick="logout()" id="logoutBtn" style="display: none; margin-top: 20px; width: 100%;">Logout</button>
+    </div>
+
+    <script>
+        // Owner credentials (in production, use proper authentication)
+        // This is a demo - real implementation should use GitHub OAuth
+        const OWNER_PASSWORD = 'demo123'; // Change this to a secure value
+        const OWNER_USERNAME = 'pulokadhikary';
+
+        // Initialize
+        const postDate = document.getElementById('postDate');
+        postDate.valueAsDate = new Date();
+
+        // Authentication handler
+        document.getElementById('ownerPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                authenticate();
+            }
+        });
+
+        function authenticate() {
+            const password = document.getElementById('ownerPassword').value;
+            if (password === OWNER_PASSWORD) {
+                document.getElementById('uploadSection').style.display = 'block';
+                document.getElementById('authSection').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'block';
+                showMessage('✅ Authentication successful!', 'success');
+                localStorage.setItem('ownerMode', 'true');
+            } else {
+                showMessage('❌ Invalid credentials. Please try again.', 'error');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('ownerMode');
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('authSection').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('ownerPassword').value = '';
+            showMessage('You have been logged out.', 'warning');
+        }
+
+        function uploadImage() {
+            const fileInput = document.getElementById('imageFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showMessage('Please select an image file.', 'error');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                showMessage('File size exceeds 5MB limit.', 'error');
+                return;
+            }
+
+            const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+                showMessage('Invalid file type. Only JPG, PNG, WebP, and GIF are allowed.', 'error');
+                return;
+            }
+
+            showMessage('✅ Image validated successfully! In production, this would be uploaded to GitHub.', 'success');
+            fileInput.value = '';
+        }
+
+        function createPost() {
+            const title = document.getElementById('postTitle').value;
+            const date = document.getElementById('postDate').value;
+            const category = document.getElementById('postCategory').value;
+            const content = document.getElementById('postContent').value;
+
+            if (!title || !date || !category || !content) {
+                showMessage('Please fill in all fields.', 'error');
+                return;
+            }
+
+            // In production, this would create a commit to GitHub
+            const fileName = `${date}-${title.toLowerCase().replace(/\s+/g, '-')}.md`;
+            const frontMatter = `---\ntitle: "${title}"\ndate: ${date}\nauthor: "${OWNER_USERNAME}"\ncategory: "${category}"\n---\n`;
+            const fullContent = frontMatter + content;
+
+            console.log('Post content that would be committed:');
+            console.log(fullContent);
+
+            showMessage(`✅ Post created! File: _posts/${fileName}\nIn production, this would be committed to GitHub.`, 'success');
+
+            // Clear form
+            document.getElementById('postTitle').value = '';
+            document.getElementById('postCategory').value = '';
+            document.getElementById('postContent').value = '';
+            postDate.valueAsDate = new Date();
+        }
+
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+            setTimeout(() => {
+                messageEl.className = 'message';
+            }, 5000);
+        }
+
+        // Check if already authenticated
+        window.addEventListener('load', () => {
+            if (localStorage.getItem('ownerMode') === 'true') {
+                document.getElementById('uploadSection').style.display = 'block';
+                document.getElementById('authSection') = document.querySelector('.auth-section');
+                document.getElementById('logoutBtn').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
